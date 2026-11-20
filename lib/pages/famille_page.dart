@@ -1,28 +1,35 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class FamillePage extends StatelessWidget {
   const FamillePage({super.key});
 
-  // Petit widget simple pour afficher un membre de la famille
-  // TODO: Tu peux ajouter d'autres cartes dans la ListView ci-dessous si tu as plus de membres
   Widget _carteMembre({
+    required BuildContext context,
     required String nom,
     required String lien,
     required String profession,
     required String photo,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      color: Colors.white,
+      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
         leading: CircleAvatar(
-          radius: 28,
+          radius: 30,
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           backgroundImage: AssetImage(photo),
         ),
-        title: Text(
-          nom,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        title: Text(nom, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Text('Lien : $lien\nProfession : $profession'),
         ),
-        subtitle: Text('Lien : $lien\nProfession : $profession'),
         isThreeLine: true,
       ),
     );
@@ -30,41 +37,45 @@ class FamillePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // TODO: Remplace par le titre souhaite pour la page famille
-        title: const Text('Ma Famille'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(12.0),
-        children: [
-          // TODO: Remplace les informations de ton pere
-          _carteMembre(
-            nom: 'WATELANINWA Papy', // TODO: Vrai nom du pere
-            lien: 'Pere', // TODO: Lien de parente
-            profession: 'Engenneer', // TODO: Profession du pere
-            photo: 'assets/images/pere.jpg', // TODO: Chemin de la photo du pere
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        Text(
+          'Les personnes qui comptent',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF153047),
           ),
-
-          // TODO: Remplace les informations de ta mere
-          _carteMembre(
-            nom: 'Mwinja Esther', // TODO: Vrai nom de ta mere
-            lien: 'Mere', // TODO: Lien de parente
-            profession: 'commercante', // TODO: Profession de ta mere
-            photo: 'assets/images/mere.jpg', // TODO: Chemin de la photo de ta mere
-          ),
-
-          // TODO: Remplace les informations d'un frere ou d'une soeur
-          _carteMembre(
-            nom: 'Peter Penuel', // TODO: Vrai nom
-            lien: 'Frere', // TODO: Lien de parente
-            profession: 'Etudiant', // TODO: Profession
-            photo: 'assets/images/frere.jpg', // TODO: Chemin de la photo
-          ),
-
-          // TODO: Pour ajouter un autre membre, copie-colle un bloc _carteMembre(...) ci-dessus
-        ],
-      ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Quelques membres de ma famille.',
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Colors.blueGrey),
+        ),
+        const SizedBox(height: 16),
+        _carteMembre(
+          context: context,
+          nom: 'WATELANINWA Papy',
+          lien: 'Pere',
+          profession: 'Engenneer',
+          photo: 'assets/images/pere.jpg',
+        ),
+        _carteMembre(
+          context: context,
+          nom: 'Mwinja Esther',
+          lien: 'Mere',
+          profession: 'commercante',
+          photo: 'assets/images/mere.jpg',
+        ),
+        _carteMembre(
+          context: context,
+          nom: 'Peter Penuel',
+          lien: 'Frere',
+          profession: 'Etudiant',
+          photo: 'assets/images/frere.jpg',
+        ),
+      ],
     );
   }
 }

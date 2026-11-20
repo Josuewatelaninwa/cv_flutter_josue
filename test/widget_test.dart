@@ -1,30 +1,43 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:cv_flutter_josue/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'package:cv_flutter_josue/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('connexion, navigation, contacts et deconnexion', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MonAppCv());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Se connecter'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).at(1)).obscureText,
+      isTrue,
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.enterText(find.byType(TextField).at(0), 'josue');
+    await tester.enterText(find.byType(TextField).at(1), '1234');
+    await tester.tap(find.text('Se connecter'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Mon CV'), findsOneWidget);
+    await tester.tap(find.text('Famille'));
+    await tester.pumpAndSettle();
+    expect(find.text('Les personnes qui comptent'), findsOneWidget);
+
+    await tester.tap(find.text('Contact'));
+    await tester.pumpAndSettle();
+    expect(find.text('josuewatelaninwa@gmail.com'), findsOneWidget);
+    final contactTile = find.ancestor(
+      of: find.text('josuewatelaninwa@gmail.com'),
+      matching: find.byType(ListTile),
+    );
+    expect(tester.widget<ListTile>(contactTile).onTap, isNotNull);
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Se deconnecter'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Connexion - CV de Josue'), findsOneWidget);
   });
 }

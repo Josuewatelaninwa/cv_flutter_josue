@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'pages/login_page.dart';
+import 'package:material_ui/material_ui.dart';
 
-// TODO: Garde bien cette fonction main(), sinon Flutter ne peut pas demarrer
+import 'pages/login_page.dart';
+import 'pages/home_page.dart';
+
 void main() {
   runApp(const MonAppCv());
 }
@@ -12,16 +13,49 @@ class MonAppCv extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // TODO: Remplace le titre de l'application si besoin
       title: 'CV de Josue',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // TODO: Tu peux changer la couleur principale (ex: Colors.blue, Colors.teal)
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF0F766E),
+          surface: const Color(0xFFF4F7FA),
+        ),
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF4F7FA),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF4F7FA),
+          foregroundColor: Color(0xFF153047),
+          surfaceTintColor: Colors.transparent,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFDCE5EB)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF0F766E), width: 1.5),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF0F766E),
+            foregroundColor: Colors.white,
+            minimumSize: const Size.fromHeight(52),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
       ),
-      // Demarre sur la Page (1) de connexion
       home: const LoginPage(),
+      routes: {'/home': (context) => const MainNavigationPage()},
     );
   }
 }

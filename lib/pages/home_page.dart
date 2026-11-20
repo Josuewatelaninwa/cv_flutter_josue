@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'famille_page.dart';
-import 'contact_page.dart';
+import 'package:material_ui/material_ui.dart';
 
-// Conteneur principal avec barre de navigation en bas pour passer d'une page a l'autre
+import 'contact_page.dart';
+import 'famille_page.dart';
+
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -13,139 +13,320 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _indexActuel = 0;
 
-  // Liste des 3 pages accessibles apres connexion
-  final List<Widget> _pages = const [
-    CvPage(),       // Page (2) Accueil / CV
-    FamillePage(),  // Page (3) Famille
-    ContactPage(),  // Page (4) Contact
-  ];
+  static const _titres = ['Mon CV', 'Ma Famille', 'Mes Coordonnees'];
+  static const _pages = [CvPage(), FamillePage(), ContactPage()];
+
+  void _selectionnerPage(int index) {
+    setState(() {
+      _indexActuel = index;
+    });
+    Navigator.pop(context);
+  }
+
+  void _seDeconnecter() {
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_indexActuel],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _indexActuel,
-        onTap: (index) {
+      appBar: AppBar(title: Text(_titres[_indexActuel])),
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            children: [
+              DrawerHeader(
+                margin: EdgeInsets.zero,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF0F766E), Color(0xFF153047)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Row(
+                  children: const [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundImage: AssetImage('assets/images/profil.jpg'),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'BARAKA Watelaninwa Josue',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Etudiant en Informatique',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _elementMenu(
+                icon: Icons.person_outline,
+                label: 'Mon CV',
+                index: 0,
+              ),
+              _elementMenu(
+                icon: Icons.family_restroom,
+                label: 'Ma Famille',
+                index: 1,
+              ),
+              _elementMenu(
+                icon: Icons.contact_phone_outlined,
+                label: 'Mes Coordonnees',
+                index: 2,
+              ),
+              const Spacer(),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Se deconnecter'),
+                iconColor: Theme.of(context).colorScheme.error,
+                textColor: Theme.of(context).colorScheme.error,
+                onTap: _seDeconnecter,
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: IndexedStack(index: _indexActuel, children: _pages),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _indexActuel,
+        onDestinationSelected: (index) {
           setState(() {
             _indexActuel = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
             label: 'CV',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.family_restroom),
             label: 'Famille',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.contact_phone),
+          NavigationDestination(
+            icon: Icon(Icons.contact_phone_outlined),
+            selectedIcon: Icon(Icons.contact_phone),
             label: 'Contact',
           ),
         ],
       ),
     );
   }
+
+  Widget _elementMenu({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(label),
+      selected: _indexActuel == index,
+      selectedColor: Theme.of(context).colorScheme.primary,
+      selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      onTap: () => _selectionnerPage(index),
+    );
+  }
 }
 
-// Page (2) d'accueil : CV complet
 class CvPage extends StatelessWidget {
   const CvPage({super.key});
 
-  // Petit widget reutilisable pour les titres de sections du CV
-  Widget _titreSection(String titre) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 18.0, bottom: 6.0),
-      child: Text(
-        titre,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _sectionCard(
+    BuildContext context, {
+    required String titre,
+    required IconData icone,
+    required List<String> lignes,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      color: Colors.white,
+      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icone, color: colorScheme.primary),
+                const SizedBox(width: 10),
+                Text(
+                  titre,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF153047),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ...lignes.map(
+              (ligne) => Padding(
+                padding: const EdgeInsets.only(bottom: 7),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, right: 9),
+                      child: Icon(
+                        Icons.circle,
+                        size: 7,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    Expanded(child: Text(ligne)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // TODO: Remplace par le titre de ton CV
-        title: const Text('Mon CV'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Photo + Nom + Titre / Profil
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0F766E), Color(0xFF153047)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(
               children: [
-                // TODO: Remplace 'assets/images/profil.jpg' par le vrai chemin de ta photo
                 const CircleAvatar(
-                  radius: 42,
-                  backgroundImage: AssetImage('assets/images/profil.jpg'),
+                  radius: 43,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 39,
+                    backgroundImage: AssetImage('assets/images/profil.jpg'),
+                  ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
-                      // TODO: Verifie ou complete ton nom complet
                       Text(
                         'BARAKA Watelaninwa Josue',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      SizedBox(height: 4),
-                      // TODO: Remplace par ton titre ou profil (ex: Etudiant en Informatique / Developpeur Junior)
-                      Text('Etudiant en Informatique - Debutant Flutter'),
-                      SizedBox(height: 4),
-                      // TODO: Remplace par ta date et ton lieu de naissance reels
-                      Text('Ne le 15 Janvier 2004 a Bukavu'),
+                      SizedBox(height: 6),
+                      Text(
+                        'Etudiant en Informatique - Debutant Flutter',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Ne le 15 Janvier 2004 a Bukavu',
+                        style: TextStyle(color: Colors.white70),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-
-            // Resume / Profil
-            _titreSection('Profil'),
-            // TODO: Remplace ce texte par ta vraie presentation / objectif professionnel
-            const Text(
+          ),
+          const SizedBox(height: 16),
+          _sectionCard(
+            context,
+            titre: 'Profil',
+            icone: Icons.account_circle_outlined,
+            lignes: const [
               'Jeune etudiant motive, ne a Bukavu, debutant en programmation et passionne par le developpement d\'applications mobiles avec Flutter.',
-            ),
-
-            // Formation
-            _titreSection('Formation'),
-            // TODO: Remplace par tes vrais diplomes, etablissements et annees
-            const Text('- Diplome d\'Etat / Licence en cours : [Nom de ton ecole ou universite] ([Annees])'),
-            const Text('- Initiation au developpement mobile avec Flutter : [Nom de ta formation/cours] ([Annee])'),
-
-            // Experiences (stages, projets, emplois)
-            _titreSection('Experiences (Stages, Projets, Emplois)'),
-            // TODO: Remplace par tes vrais stages, projets academiques/personnels ou emplois
-            const Text('- Projet academique : Application mobile CV en Flutter ([Annee])'),
-            const Text('- Stage / Emploi : [Intitule du poste ou stage] chez [Nom de l\'organisation] ([Periode])'),
-
-            // Competences techniques
-            _titreSection('Competences techniques'),
-            // TODO: Remplace par tes vraies competences techniques (langages, outils, bureautique, etc.)
-            const Text('- Langages / Frameworks : Dart, Flutter (bases), HTML/CSS (a completer)'),
-            const Text('- Outils : Git, GitHub, VS Code / Android Studio, Microsoft Office'),
-
-            // Competences linguistiques
-            _titreSection('Competences linguistiques'),
-            // TODO: Remplace par les langues que tu parles et ton vrai niveau
-            const Text('- Francais : [Niveau, ex: Courant / Intermediaire]'),
-            const Text('- Swahili : [Niveau, ex: Langue maternelle / Courant]'),
-            const Text('- Anglais : [Niveau, ex: Notions / Intermediaire]'),
-
-            // Centres d'interet
-            _titreSection('Centres d\'interet'),
-            // TODO: Remplace par tes vrais centres d'interet
-            const Text('- Programmation et nouvelles technologies, lecture, sport, musique'),
-          ],
-        ),
+            ],
+          ),
+          _sectionCard(
+            context,
+            titre: 'Formation',
+            icone: Icons.school_outlined,
+            lignes: const [
+              'Diplome d\'Etat : LYCEE MADRE ELENA (2022-2023)',
+              'Licence en cours : Institut Supérieur d\'informatique et de gestion (2023-2026)',
+              'Initiation au developpement mobile avec Flutter : Programmation mobile : flutter (2026)',
+            ],
+          ),
+          _sectionCard(
+            context,
+            titre: 'Experiences (Stages, Projets, Emplois)',
+            icone: Icons.work_outline,
+            lignes: const [
+              ' Emploi : Techinicien et Ingnieur système chez Green World International (KASOK UNITED)) (2026-Aujourdhui)',
+              'Projet academique : Application mobile CV en Flutter (2026)',
+              'Formation Pratique : Photographie et Vidéographie (2023-2024)',
+              
+            ],
+          ),
+          _sectionCard(
+            context,
+            titre: 'Competences techniques',
+            icone: Icons.code,
+            lignes: const [
+              'Langages / Frameworks : Dart, Flutter (bases), HTML/CSS (Moyen)',
+              'Outils : Git, GitHub, VS Code / Android Studio, Microsoft Office',
+            ],
+          ),
+          _sectionCard(
+            context,
+            titre: 'Competences linguistiques',
+            icone: Icons.translate,
+            lignes: const [
+              'Francais : Niveau : Intermediaire',
+              'Swahili : Niveau: Langue maternelle;',
+              'Anglais : Niveau : Notions ',
+            ],
+          ),
+          _sectionCard(
+            context,
+            titre: 'Centres d\'interet',
+            icone: Icons.favorite_border,
+            lignes: const [
+              'Programmation et nouvelles technologies, lecture, sport, musique',
+            ],
+          ),
+        ],
       ),
     );
   }
