@@ -48,17 +48,17 @@ class FamillePage extends StatelessWidget {
 
           // TODO: Remplace les informations de ta mere
           _carteMembre(
-            nom: 'Nom de la Mere', // TODO: Vrai nom de ta mere
+            nom: 'Mwinja Esther', // TODO: Vrai nom de ta mere
             lien: 'Mere', // TODO: Lien de parente
-            profession: 'Profession de la mere', // TODO: Profession de ta mere
+            profession: 'commercante', // TODO: Profession de ta mere
             photo: 'assets/images/mere.jpg', // TODO: Chemin de la photo de ta mere
           ),
 
           // TODO: Remplace les informations d'un frere ou d'une soeur
           _carteMembre(
-            nom: 'Nom du Frere ou de la Soeur', // TODO: Vrai nom
-            lien: 'Frere / Soeur', // TODO: Lien de parente
-            profession: 'Etudiant(e) / Profession', // TODO: Profession
+            nom: 'Peter Penuel', // TODO: Vrai nom
+            lien: 'Frere', // TODO: Lien de parente
+            profession: 'Etudiant', // TODO: Profession
             photo: 'assets/images/frere.jpg', // TODO: Chemin de la photo
           ),
 
