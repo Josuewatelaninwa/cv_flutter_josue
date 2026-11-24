@@ -81,7 +81,13 @@ l'accès dans l'application, mais n'ajoute pas une autorisation côté serveur.
 
 ## Démonstration vidéo
 
-[Regarder le tutoriel vidéo](assets/videos/tutoriel.mp4)
+[Lire le tutoriel vidéo](https://josuewatelaninwa.github.io/cv_flutter_josue/video.html)
+
+[Télécharger le MP4 original](assets/videos/tutoriel.mp4)
+
+Le lecteur utilise directement le MP4 du dépôt, sans conversion. Pour le
+publier, activez GitHub Pages dans **Settings > Pages**, puis choisissez la
+branche `main` et le dossier `/(root)` comme source de déploiement.
 
 ## Getting Started
 
