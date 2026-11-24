@@ -81,10 +81,7 @@ l'accès dans l'application, mais n'ajoute pas une autorisation côté serveur.
 
 ## Démonstration vidéo
 
-<video src="assets/videos/tutoriel.mp4" controls preload="none" width="100%">
-  Votre navigateur ne prend pas en charge la lecture vidéo.
-  <a href="assets/videos/tutoriel.mp4">Télécharger la vidéo originale</a>.
-</video>
+[Regarder le tutoriel vidéo](assets/videos/tutoriel.mp4)
 
 ## Getting Started
 
