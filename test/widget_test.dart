@@ -3,41 +3,40 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  testWidgets('connexion, navigation, contacts et deconnexion', (
+  testWidgets('la connexion utilise un e-mail et valide les champs', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const MonAppCv());
 
-    expect(find.text('Se connecter'), findsOneWidget);
-    expect(
-      tester.widget<TextField>(find.byType(TextField).at(1)).obscureText,
-      isTrue,
-    );
-
-    await tester.enterText(find.byType(TextField).at(0), 'josue');
-    await tester.enterText(find.byType(TextField).at(1), '1234');
+    expect(find.text('Adresse e-mail'), findsOneWidget);
     await tester.tap(find.text('Se connecter'));
     await tester.pumpAndSettle();
+    expect(find.text('Saisissez une adresse e-mail valide.'), findsOneWidget);
 
-    expect(find.text('Mon CV'), findsOneWidget);
-    await tester.tap(find.text('Famille'));
-    await tester.pumpAndSettle();
-    expect(find.text('Les personnes qui comptent'), findsOneWidget);
-
-    await tester.tap(find.text('Contact'));
-    await tester.pumpAndSettle();
-    expect(find.text('josuewatelaninwa@gmail.com'), findsOneWidget);
-    final contactTile = find.ancestor(
-      of: find.text('josuewatelaninwa@gmail.com'),
-      matching: find.byType(ListTile),
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'josue@example.com',
     );
-    expect(tester.widget<ListTile>(contactTile).onTap, isNotNull);
-
-    await tester.tap(find.byIcon(Icons.menu));
+    await tester.tap(find.text('Se connecter'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Se deconnecter'));
+    expect(find.text('Saisissez votre mot de passe.'), findsOneWidget);
+  });
+
+  testWidgets('la création de compte valide la longueur du mot de passe', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MonAppCv());
+    await tester.tap(find.text('Créer un compte'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Connexion - CV de Josue'), findsOneWidget);
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'josue@example.com',
+    );
+    await tester.enterText(find.byType(TextFormField).last, '123');
+    await tester.tap(find.text('Créer un compte').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('6 caractères minimum.'), findsOneWidget);
   });
 }

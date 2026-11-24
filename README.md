@@ -1,6 +1,52 @@
-# cv_flutter_josue
+# CV Flutter - Josue
 
-A new Flutter project.
+Application Flutter de présentation du CV et des coordonnées, avec connexion
+par l'API REST et gestion des membres de la famille.
+
+## Préparer et démarrer l'API
+
+Suivez d'abord les étapes du [README de l'API](https://github.com/espoirbaraka/api-test/blob/main/README.md) :
+
+1. Placez le projet API dans `C:\xampp\htdocs\api-test` et démarrez Apache et
+   MySQL depuis XAMPP.
+2. Créez la base `api`, puis importez `api.sql` dans phpMyAdmin.
+3. Copiez `.env.example` vers `.env` et vérifiez les paramètres de connexion
+   MySQL.
+4. Vérifiez que l'API répond à `http://localhost/api-test/public`. Le segment
+   `/public` est requis.
+
+L'adresse par défaut s'adapte à la plateforme : navigateur, bureau et
+simulateur iOS utilisent `http://localhost/api-test/public`; l'émulateur
+Android utilise `http://10.0.2.2/api-test/public`. Pour un téléphone physique,
+utilisez l'adresse IP locale de l'ordinateur sur le même réseau :
+
+```powershell
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10/api-test/public
+```
+
+Remplacez `192.168.1.10` par l'adresse réelle de l'ordinateur.
+
+## Photos de famille
+
+Les images préparées dans `assets/images/` servent aux éléments statiques de
+l'application. Pour les membres gérés par l'API, sélectionnez une photo dans
+la galerie au moment de créer ou modifier leur fiche. L'API accepte JPG, PNG,
+GIF et WEBP jusqu'à 2 Mo. La fiche et son URL d'image sont chargées depuis
+l'API ; les opérations utilisent les routes `famille-membres` documentées dans
+son README. Sur le Web, l'affichage des images utilise le mode HTML de Flutter
+pour contourner l'absence d'en-tête CORS sur les fichiers statiques de l'API.
+
+Le README de l'API ne propose pas de route pour modifier la photo de profil.
+La photo de profil actuelle reste donc celle fournie localement dans
+`assets/images/profil.jpg`.
+
+## Connexion
+
+Créez un compte depuis l'écran de connexion (adresse e-mail et mot de passe
+d'au moins six caractères), puis connectez-vous. L'API valide réellement les
+identifiants. Selon son README, elle ne fournit toutefois ni jeton de session
+ni protection d'authentification sur les autres routes : la connexion valide
+l'accès dans l'application, mais n'ajoute pas une autorisation côté serveur.
 
 ## Captures d'écran
 
@@ -32,6 +78,10 @@ A new Flutter project.
     </td>
   </tr>
 </table>
+
+## Démonstration vidéo
+
+[Regarder le tutoriel vidéo](assets/videos/tutoriel.mp4)
 
 ## Getting Started
 

@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../services/api_service.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -8,42 +10,47 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _identifiantController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _motDePasseController = TextEditingController();
-
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _messageErreur = '';
+  bool _chargement = false;
+  bool _inscription = false;
 
-  final String _identifiantAttendu = 'josue';
-  final String _motDePasseAttendu = '1234';
-
-  void _seConnecter() {
-    final String identifiantSaisi = _identifiantController.text.trim();
-    final String motDePasseSaisi = _motDePasseController.text;
-
-    if (identifiantSaisi.isEmpty || motDePasseSaisi.isEmpty) {
+  Future<void> _soumettre() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _chargement = true;
+      _messageErreur = '';
+    });
+    final email = _emailController.text.trim();
+    final password = _motDePasseController.text;
+    try {
+      if (_inscription) {
+        await ApiService.instance.register(email, password);
+        if (!mounted) return;
+        setState(() {
+          _inscription = false;
+          _chargement = false;
+          _messageErreur = 'Compte créé. Connectez-vous avec vos identifiants.';
+        });
+      } else {
+        await ApiService.instance.login(email, password);
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on ApiException catch (error) {
+      if (!mounted) return;
       setState(() {
-        _messageErreur = 'Veuillez remplir l\'identifiant et le mot de passe.';
-      });
-      return;
-    }
-
-    if (identifiantSaisi == _identifiantAttendu &&
-        motDePasseSaisi == _motDePasseAttendu) {
-      setState(() {
-        _messageErreur = '';
-      });
-
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      setState(() {
-        _messageErreur = 'Identifiant ou mot de passe incorrect.';
+        _messageErreur = error.message;
+        _chargement = false;
       });
     }
   }
 
   @override
   void dispose() {
-    _identifiantController.dispose();
+    _emailController.dispose();
     _motDePasseController.dispose();
     super.dispose();
   }
@@ -83,7 +90,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Connectez-vous pour découvrir mon parcours.',
+                  _inscription
+                      ? 'Créez un compte avec l’API pour continuer.'
+                      : 'Connectez-vous pour découvrir mon parcours.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge
                       ?.copyWith(color: Colors.blueGrey),
@@ -98,46 +107,103 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(22),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _identifiantController,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Identifiant',
-                            prefixIcon: Icon(Icons.person_outline),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _motDePasseController,
-                          obscureText: true,
-                          onSubmitted: (_) => _seConnecter(),
-                          decoration: const InputDecoration(
-                            labelText: 'Mot de passe',
-                            prefixIcon: Icon(Icons.lock_outline),
-                          ),
-                        ),
-                        if (_messageErreur.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Text(
-                            _messageErreur,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: 'Adresse e-mail',
+                              prefixIcon: Icon(Icons.email_outlined),
                             ),
-                            textAlign: TextAlign.center,
+                            validator: (value) {
+                              final email = value?.trim() ?? '';
+                              if (email.length > 100 ||
+                                  !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                                      .hasMatch(email)) {
+                                return 'Saisissez une adresse e-mail valide.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _motDePasseController,
+                            obscureText: true,
+                            onFieldSubmitted: (_) => _soumettre(),
+                            decoration: const InputDecoration(
+                              labelText: 'Mot de passe',
+                              prefixIcon: Icon(Icons.lock_outline),
+                            ),
+                            validator: (value) {
+                              final password = value ?? '';
+                              if (password.isEmpty) {
+                                return 'Saisissez votre mot de passe.';
+                              }
+                              if (_inscription && password.length < 6) {
+                                return '6 caractères minimum.';
+                              }
+                              return null;
+                            },
+                          ),
+                          if (_messageErreur.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Text(
+                              _messageErreur,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: _messageErreur.startsWith('Compte créé')
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _chargement ? null : _soumettre,
+                              icon: _chargement
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Icon(
+                                      _inscription
+                                          ? Icons.person_add
+                                          : Icons.login,
+                                    ),
+                              label: Text(
+                                _inscription
+                                    ? 'Créer un compte'
+                                    : 'Se connecter',
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _chargement
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _inscription = !_inscription;
+                                      _messageErreur = '';
+                                    });
+                                  },
+                            child: Text(
+                              _inscription
+                                  ? 'J’ai déjà un compte'
+                                  : 'Créer un compte',
+                            ),
                           ),
                         ],
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: _seConnecter,
-                            icon: const Icon(Icons.login),
-                            label: const Text('Se connecter'),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
